@@ -105,7 +105,7 @@ def random_route(
         # randomly break with a probability that increases as we get closer to max_weight
         if weight > min_weight:
             if pl.Series(
-                ([False] * (max_weight - weight)) + ([True] * (-min_weight + weight))
+                ([False] * (max_weight - weight)) + ([True] * (-min_weight + weight + 4))
             ).sample(n=1)[0]:
                 break
 

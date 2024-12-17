@@ -16,6 +16,8 @@ class Edge:
 
 
 def cities_in_route(edges: list[Edge]):
+    if len(edges) < 1:
+        return []
     return [e.city_a for e in edges] + [edges[-1].city_b]
 
 
