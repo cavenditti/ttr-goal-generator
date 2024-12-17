@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
-import { Card, Dialog, Text } from 'react-native-paper';
+import { Card, Dialog, IconButton, Text } from 'react-native-paper';
 import { Portal, Button } from 'react-native-paper';
 
 interface Route {
@@ -78,14 +78,30 @@ const PlayerSelect = (
 
   return (
     <Portal>
-      <Dialog visible={visible} onDismiss={hideDialog} style={{ width: "50%", height: "50%", marginLeft: "25%", padding: "12%" }}>
+      <Dialog visible={visible} onDismiss={hideDialog} style={{ width: "50%", height: "50%", marginLeft: "25%", padding: "10%" }}>
         <View style={{ position: "absolute", top: 10 }}>
           <Text>Assign</Text>
           <Text><Text variant="titleLarge">{route.from} — {route.to}</Text>    ({route.value} pts)</Text>
         </View>
         {
-          players.map((p, i) => <Button icon="account" key={p.name} mode="contained" style={{ margin: 10 }} onPress={() => { set(i) }}>{p.name}</Button>)
+          players.map((p, i) => <Button labelStyle={{ fontSize: 18, marginVertical: 22 }} icon="account" key={p.name} mode="contained" style={{ margin: 20 }} onPress={() => { set(i) }}>{p.name}</Button>)
         }
+      </Dialog>
+    </Portal >
+  );
+};
+
+const RefreshConfirm = ({ dialogState }: { dialogState: any }) => {
+  const [visible, setVisible] = dialogState;
+
+  const hideDialog = () => setVisible(false);
+
+  return (
+    <Portal>
+      <Dialog visible={visible} onDismiss={hideDialog} style={{ width: "50%", height: "35%", marginLeft: "25%", paddingHorizontal: "12%", borderColor: "red", borderWidth: 2 }}>
+          <Text variant="titleLarge" style={{ alignSelf: "center", paddingVertical: 50}}>Are you sure?</Text>
+          <Button mode="contained" style={{ backgroundColor: "#f44", marginVertical: 20 }} onPress={() => window.location.reload()}>Yes</Button>
+          <Button mode="contained" onPress={hideDialog}>No</Button>
       </Dialog>
     </Portal >
   );
@@ -134,6 +150,7 @@ function ScoreCard({ player }: { player: Player }) {
 
 export default function HomeScreen() {
   const [visible, setVisible] = React.useState(false);
+  const [confirmVisible, setConfirmVisible] = React.useState(false);
   const [selectedRoute, setSelectedRoute] = React.useState({ from: "Roma", to: "Venezia", value: 2 });
   const [players, setPlayers] = React.useState([
     {
@@ -158,8 +175,10 @@ export default function HomeScreen() {
     players={players}
     setPlayers={setPlayers}
   />;
+  const refreshConfirm = <RefreshConfirm dialogState={[confirmVisible, setConfirmVisible]} />
 
   const showDialog = () => setVisible(true);
+  const showRefreshConfirm = () => setConfirmVisible(true);
 
   const example_route: Route = {
     from: "Roma",
@@ -199,6 +218,19 @@ export default function HomeScreen() {
         </View>
         {dialog}
       </View>
+      <IconButton
+        disabled
+        icon="account-edit"
+        mode="contained"
+        style={{ position: 'absolute', right: 30, bottom: 10 }}
+      />
+      <IconButton
+        icon="refresh"
+        mode="contained"
+        style={{ position: 'absolute', left: 30, bottom: 10, backgroundColor: "#f44" }}
+        onPress={showRefreshConfirm}
+      />
+      {refreshConfirm}
     </ThemedView>
   );
 }
