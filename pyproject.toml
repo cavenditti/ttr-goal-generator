@@ -1,0 +1,17 @@
+[project]
+name = "ttr-goals"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastexcel>=0.12.0",
+    "polars>=1.17.1",
+    "pyarrow>=18.1.0",
+    "xlsxwriter>=3.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "bpython>=0.24",
+]
