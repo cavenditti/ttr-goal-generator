@@ -109,6 +109,7 @@ def random_route(
             ).sample(n=1)[0]:
                 break
 
+    # the-big-catch-all-check™
     if weight < min_weight or len(route) == 0 or latest == first_city:
         # We didn't find a suitable route. Let's start again.
         # WARNING: doesn't check for impossible parameters and may hang indefinitely
