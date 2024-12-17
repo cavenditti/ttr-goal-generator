@@ -6,7 +6,7 @@ class City(str):
 
 
 @dataclass
-class Path:
+class Edge:
     city_a: City
     city_b: City
     weight: int
@@ -15,16 +15,16 @@ class Path:
     is_gallery: bool
 
 
-def cities_in_route(paths: list[Path]):
-    return [a for p in paths for a in [p.city_a, p.city_b]]
+def cities_in_route(edges: list[Edge]):
+    return [a for e in edges for a in [e.city_a, e.city_b]]
 
 
 @dataclass
 class Route:
-    paths: list[Path]
+    edges: list[Edge]
     city_a: City
     city_b: City
     weight: int
 
     def __repr__(self) -> str:
-        return f"Route({self.city_a} — {self.city_b}, w: {self.weight}, through: {cities_in_route(self.paths)[1:-1]}"
+        return f"Route({self.city_a} — {self.city_b}, w: {self.weight}, through: {cities_in_route(self.edges)[1:-1]}"

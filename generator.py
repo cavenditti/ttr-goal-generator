@@ -1,6 +1,6 @@
 import polars as pl
 
-from typedefs import City, Path, Route, cities_in_route
+from typedefs import City, Edge, Route, cities_in_route
 
 
 def cities(df: pl.DataFrame) -> set[str]:
@@ -86,7 +86,7 @@ def random_route(
         )
 
         route.append(
-            Path(
+            Edge(
                 city_a=city_a,
                 city_b=city_b,
                 weight=selected[weight_col][0],
@@ -115,7 +115,7 @@ def random_route(
         return random_route(df, min_weight, max_weight, weight_col=weight_col)
 
     return Route(
-        paths=route,
+        edges=route,
         city_a=first_city,
         city_b=latest,
         weight=weight,
