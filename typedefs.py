@@ -16,7 +16,7 @@ class Edge:
 
 
 def cities_in_route(edges: list[Edge]):
-    return [a for e in edges for a in [e.city_a, e.city_b]]
+    return [e.city_a for e in edges] + [edges[-1].city_b]
 
 
 @dataclass
