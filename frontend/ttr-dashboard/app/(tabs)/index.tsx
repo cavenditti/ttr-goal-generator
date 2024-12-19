@@ -5,9 +5,9 @@ import { Card, Dialog, IconButton, Text } from 'react-native-paper';
 import { Portal, Button } from 'react-native-paper';
 
 interface Route {
-  from: string
-  to: string
-  value: number
+  city_a: string
+  city_b: string
+  weight: number
 }
 
 interface Player {
@@ -38,7 +38,7 @@ function PlayerOverview(
             {
               player.routes.map((r, i) =>
                 <View key={i} style={{ paddingVertical: 30 }}>
-                  <GoalCard route={r} showDialog={() => { }} />
+                  <GoalCard route={r} showDialog={() => { }} setSelectedRoute={(route: Route) => { }} />
                 </View>
               )
             }
@@ -54,7 +54,7 @@ const PlayerSelect = (
     route,
     dialogState,
     players,
-    setPlayers
+    setPlayers,
   }: {
     route: Route,
     dialogState: any,
@@ -69,7 +69,7 @@ const PlayerSelect = (
     let new_players = players;
     new_players[player_index] = {
       ...new_players[player_index],
-      score: + new_players[player_index].score + route.value,
+      score: + new_players[player_index].score + route.weight,
       routes: new_players[player_index].routes.concat(route)
     };
     setPlayers(new_players);
@@ -81,7 +81,7 @@ const PlayerSelect = (
       <Dialog visible={visible} onDismiss={hideDialog} style={{ width: "50%", height: "50%", marginLeft: "25%", padding: "10%" }}>
         <View style={{ position: "absolute", top: 10 }}>
           <Text>Assign</Text>
-          <Text><Text variant="titleLarge">{route.from} — {route.to}</Text>    ({route.value} pts)</Text>
+          <Text><Text variant="titleLarge">{route.city_a} — {route.city_b}</Text>    ({route.weight} pts)</Text>
         </View>
         {
           players.map((p, i) => <Button labelStyle={{ fontSize: 18, marginVertical: 22 }} icon="account" key={p.name} mode="contained" style={{ margin: 20 }} onPress={() => { set(i) }}>{p.name}</Button>)
@@ -99,19 +99,22 @@ const RefreshConfirm = ({ dialogState }: { dialogState: any }) => {
   return (
     <Portal>
       <Dialog visible={visible} onDismiss={hideDialog} style={{ width: "50%", height: "35%", marginLeft: "25%", paddingHorizontal: "12%", borderColor: "red", borderWidth: 2 }}>
-          <Text variant="titleLarge" style={{ alignSelf: "center", paddingVertical: 50}}>Are you sure?</Text>
-          <Button mode="contained" style={{ backgroundColor: "#f44", marginVertical: 20 }} onPress={() => window.location.reload()}>Yes</Button>
-          <Button mode="contained" onPress={hideDialog}>No</Button>
+        <Text variant="titleLarge" style={{ alignSelf: "center", paddingVertical: 50 }}>Are you sure?</Text>
+        <Button mode="contained" style={{ backgroundColor: "#f44", marginVertical: 20 }} onPress={() => window.location.reload()}>Yes</Button>
+        <Button mode="contained" onPress={hideDialog}>No</Button>
       </Dialog>
     </Portal >
   );
 };
 
-function GoalCard({ route, showDialog }: { route: Route, showDialog: any }) {
+function GoalCard({ route, showDialog, setSelectedRoute }: { route: Route, showDialog: any, setSelectedRoute: any }) {
 
   return <Card
     style={styles.card}
-    onPress={() => { showDialog() }}
+    onPress={() => {
+      setSelectedRoute(route);
+      showDialog();
+    }}
   >
     <ImageBackground
       source={require("@/assets/images/background.jpg")}
@@ -126,10 +129,11 @@ function GoalCard({ route, showDialog }: { route: Route, showDialog: any }) {
     />
     <View style={{ width: "100%", height: "100%", flexDirection: "column", alignContent: "space-between" }}>
       <View style={styles.mainContainer}>
-        <Text style={{ fontSize: 32, }}>{`${route.from} — ${route.to}`}</Text>
+        <Text style={{ fontSize: 32, }}>{route.city_a}</Text>
+        <Text style={{ fontSize: 32, }}>{route.city_b}</Text>
       </View>
       <View style={styles.mainContainer}>
-        <Text style={{ fontSize: 64, fontWeight: "bold", color: "red", position: "absolute", right: 0 }}>{route.value}</Text>
+        <Text style={{ fontSize: 64, fontWeight: "bold", color: "red", position: "absolute", right: 0 }}>{route.weight}</Text>
       </View>
     </View>
   </Card>
@@ -151,7 +155,7 @@ function ScoreCard({ player }: { player: Player }) {
 export default function HomeScreen() {
   const [visible, setVisible] = React.useState(false);
   const [confirmVisible, setConfirmVisible] = React.useState(false);
-  const [selectedRoute, setSelectedRoute] = React.useState({ from: "Roma", to: "Venezia", value: 2 });
+  const [selectedRoute, setSelectedRoute] = React.useState({ city_a: "Roma", city_b: "Venezia", weight: 2 });
   const [players, setPlayers] = React.useState([
     {
       name: "P1",
@@ -169,6 +173,12 @@ export default function HomeScreen() {
       routes: [],
     },
   ]);
+
+  React.useEffect(() => {
+      const i = routes.findIndex((r) => { return r.city_a === selectedRoute.city_a && r.city_b === selectedRoute.city_b && r.weight === selectedRoute.weight });
+      replaceRoute(i);
+  }, [players, selectedRoute]);
+
   const dialog = <PlayerSelect
     route={selectedRoute}
     dialogState={[visible, setVisible]}
@@ -180,11 +190,44 @@ export default function HomeScreen() {
   const showDialog = () => setVisible(true);
   const showRefreshConfirm = () => setConfirmVisible(true);
 
-  const example_route: Route = {
-    from: "Roma",
-    to: "Venezia",
-    value: 2,
+  const [routes, setRoutes] = React.useState<Route[]>([]);
+
+
+  const addRandomRoute = async () => {
+    try {
+      const response = await fetch(
+        'http://localhost:8000',
+      );
+      const json = await response.json();
+      console.log(json);
+      setRoutes((old_routes) => { return old_routes.concat(json) });
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  const replaceRoute = async (index: number) => {
+    try {
+      const response = await fetch(
+        'http://localhost:8000',
+      );
+      const json = await response.json();
+      console.log(json);
+      setRoutes((old_routes) => {
+        let new_routes = old_routes;
+        new_routes[index] = json;
+        return new_routes;
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  React.useEffect(() => {
+    for (let i = 0; i < 6; i++) {
+      addRandomRoute();
+    }
+  }, []);
 
   return (
     <ThemedView style={styles.mainContainer}>
@@ -207,14 +250,18 @@ export default function HomeScreen() {
 
       <View style={styles.column}>
         <View style={styles.row}>
-          <GoalCard route={example_route} showDialog={showDialog} />
-          <GoalCard route={example_route} showDialog={showDialog} />
-          <GoalCard route={example_route} showDialog={showDialog} />
+          {
+            routes.slice(0, 3).map(
+              (r, i) => <GoalCard key={i} route={r} showDialog={showDialog} setSelectedRoute={setSelectedRoute} />
+            )
+          }
         </View>
         <View style={styles.row}>
-          <GoalCard route={example_route} showDialog={showDialog} />
-          <GoalCard route={example_route} showDialog={showDialog} />
-          <GoalCard route={example_route} showDialog={showDialog} />
+          {
+            routes.slice(3, 6).map(
+              (r, i) => <GoalCard key={i} route={r} showDialog={showDialog} setSelectedRoute={setSelectedRoute} />
+            )
+          }
         </View>
         {dialog}
       </View>
