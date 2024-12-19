@@ -3,7 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import polars as pl
 
-from generator import random_route
+from dijkstra import compute_pairwise_distances
+from generator import cached_random_route, random_route
 
 DF = pl.read_excel("./routes.xlsx")
 DF2 = DF.with_columns(
@@ -28,6 +29,14 @@ app.add_middleware(
 )
 
 
+DISTANCES = compute_pairwise_distances(
+    DF2,
+    source_col="city_a",
+    target_col="city_b",
+    weight_col="cost",
+)
+
+
 @app.get("/")
 async def root():
-    return asdict(random_route(DF2, 4, 12, weight_col="cost"))
+    return asdict(cached_random_route(DISTANCES, 4, 12))
