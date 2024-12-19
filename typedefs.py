@@ -23,10 +23,9 @@ def cities_in_route(edges: list[Edge]):
 
 @dataclass
 class Route:
-    edges: list[Edge]
     city_a: City
     city_b: City
     weight: int
 
     def __repr__(self) -> str:
-        return f"Route({self.city_a} — {self.city_b}, w: {self.weight}, through: {cities_in_route(self.edges)[1:-1]}"
+        return f"Route({self.city_a} — {self.city_b}, w: {self.weight})"
