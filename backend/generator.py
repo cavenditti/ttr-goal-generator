@@ -4,12 +4,6 @@ import polars as pl
 from typedefs import Route
 
 
-def cities(df: pl.DataFrame) -> set[str]:
-    a = df.select(pl.col("city_a").unique())[:, "city_a"]
-    b = df.select(pl.col("city_b").unique())[:, "city_b"]
-    return set(a.to_list()) | set(b.to_list())
-
-
 def cached_random_route(
     distances_df: pl.DataFrame,
     min_weight: int,
@@ -26,7 +20,7 @@ def cached_random_route(
     return Route(
         city_a=selected[0, "source"],
         city_b=selected[0, "target"],
-        weight=round(selected[0, "distance"]),
+        weight=selected[0, "distance"],
     )
 
 

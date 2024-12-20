@@ -5,6 +5,7 @@ import polars as pl
 
 from dijkstra import compute_pairwise_distances
 from generator import cached_random_route
+from utils import node_degrees, node_degrees_2nd
 
 WEIGHT_MULT = 1
 LOCOMOTIVES_MULT = 1
@@ -49,7 +50,19 @@ DISTANCES = compute_pairwise_distances(
     weight_col="cost",
 )
 
+ND2 = (
+    pl.DataFrame(node_degrees_2nd(DF))
+    .transpose(include_header=True, header_name="city", column_names=["nd2"])
+    .with_columns((pl.col("nd2").max() - pl.col("nd2")) * 0.1)
+)
+
 
 @app.get("/")
 async def root():
-    return asdict(cached_random_route(DISTANCES, 7, 14))
+    route = cached_random_route(DISTANCES, 5, 13)
+    route.weight = round(
+        route.weight
+        + ND2.filter(pl.col("city") == route.city_a)[0, "nd2"]
+        + ND2.filter(pl.col("city") == route.city_b)[0, "nd2"]
+    )
+    return asdict(route)
