@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { Card, Dialog, IconButton, Text } from 'react-native-paper';
 import { Portal, Button } from 'react-native-paper';
@@ -78,8 +78,20 @@ const PlayerSelect = (
 
   return (
     <Portal>
-      <Dialog visible={visible} onDismiss={hideDialog} style={{ width: "50%", minHeight: "50%", marginLeft: "25%", paddingHorizontal: "10%", paddingTop: "8%", paddingBottom: "3%" }}>
-        <View style={{ position: "absolute", top: 10 }}>
+      <Dialog visible={visible} onDismiss={hideDialog} style={{ width: "50%", minHeight: "50%", marginLeft: "25%", paddingHorizontal: "10%", paddingTop: "8%", paddingBottom: "3%", overflow: "hidden" }}>
+          <Image
+            source={require("@/assets/images/ticket.webp")}
+            style={{
+              width: 280,
+              height: 200,
+              top: -80,
+              right: 10,
+              position: "absolute",
+              opacity: 0.25,
+              transform: [{ rotateZ: "12deg" }],
+            }}
+          />
+        <View style={{ position: "absolute", top: 45 }}>
           <Text>Assign</Text>
           <Text><Text variant="titleLarge">{route.city_a} — {route.city_b}</Text>    ({route.weight} pts)</Text>
         </View>
@@ -133,7 +145,7 @@ function GoalCard({ route, showDialog, setSelectedRoute }: { route: Route, showD
         <Text style={{ fontSize: 32, }}>{route.city_b}</Text>
       </View>
       <View style={styles.mainContainer}>
-        <Text style={{ fontSize: 64, fontWeight: "bold", color: "red", position: "absolute", right: 0 }}>{route.weight}</Text>
+        <Text style={{ fontSize: 64, fontWeight: "bold", color: "#ff4400", position: "absolute", right: 0 }}>{route.weight}</Text>
       </View>
     </View>
   </Card>
@@ -175,8 +187,8 @@ export default function HomeScreen() {
   ]);
 
   React.useEffect(() => {
-      const i = routes.findIndex((r) => { return r.city_a === selectedRoute.city_a && r.city_b === selectedRoute.city_b && r.weight === selectedRoute.weight });
-      replaceRoute(i);
+    const i = routes.findIndex((r) => { return r.city_a === selectedRoute.city_a && r.city_b === selectedRoute.city_b && r.weight === selectedRoute.weight });
+    replaceRoute(i);
   }, [players, selectedRoute]);
 
   const dialog = <PlayerSelect
