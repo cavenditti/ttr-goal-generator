@@ -78,7 +78,7 @@ const PlayerSelect = (
 
   return (
     <Portal>
-      <Dialog visible={visible} onDismiss={hideDialog} style={{ width: "50%", height: "50%", marginLeft: "25%", padding: "10%" }}>
+      <Dialog visible={visible} onDismiss={hideDialog} style={{ width: "50%", minHeight: "50%", marginLeft: "25%", paddingHorizontal: "10%", paddingTop: "8%", paddingBottom: "3%" }}>
         <View style={{ position: "absolute", top: 10 }}>
           <Text>Assign</Text>
           <Text><Text variant="titleLarge">{route.city_a} — {route.city_b}</Text>    ({route.weight} pts)</Text>
