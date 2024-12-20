@@ -12,7 +12,7 @@ GALLERY_MULT = 2
 
 SCALE_FACTOR = 0.8
 
-DF = pl.read_excel("./routes.xlsx")
+DF = pl.read_excel("../routes.xlsx")
 DF2 = DF.with_columns(
     (
         SCALE_FACTOR
