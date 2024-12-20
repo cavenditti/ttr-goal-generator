@@ -26,7 +26,7 @@ def cached_random_route(
     return Route(
         city_a=selected[0, "source"],
         city_b=selected[0, "target"],
-        weight=selected[0, "distance"],
+        weight=round(selected[0, "distance"]),
     )
 
 

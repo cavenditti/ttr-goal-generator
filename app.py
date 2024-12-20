@@ -4,11 +4,24 @@ from fastapi.middleware.cors import CORSMiddleware
 import polars as pl
 
 from dijkstra import compute_pairwise_distances
-from generator import cached_random_route, random_route
+from generator import cached_random_route
+
+WEIGHT_MULT = 1
+LOCOMOTIVES_MULT = 1
+GALLERY_MULT = 2
+
+SCALE_FACTOR = 0.8
 
 DF = pl.read_excel("./routes.xlsx")
 DF2 = DF.with_columns(
-    (pl.col("weight") + (pl.col("locomotives")) + pl.col("is_gallery")).alias("cost")
+    (
+        SCALE_FACTOR
+        * (
+            WEIGHT_MULT * pl.col("weight")
+            + LOCOMOTIVES_MULT * (pl.col("locomotives"))
+            + GALLERY_MULT * pl.col("is_gallery")
+        )
+    ).alias("cost")
 ).sort("cost")
 
 origins = [
@@ -39,4 +52,4 @@ DISTANCES = compute_pairwise_distances(
 
 @app.get("/")
 async def root():
-    return asdict(cached_random_route(DISTANCES, 4, 12))
+    return asdict(cached_random_route(DISTANCES, 7, 14))
