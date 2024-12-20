@@ -7,8 +7,7 @@ cd ..
 
 # frontend
 cd frontend/ttr-dashboard/
-#CI=1 bunx expo start &
-bunx expo start &
+CI=1 bunx expo start &
 
 # open web page
 sleep 2
