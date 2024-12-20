@@ -2,11 +2,13 @@
 
 # backend
 cd backend/
-uv run fastapi dev &
+uv sync
+uv run fastapi run &
 cd ..
 
 # frontend
 cd frontend/ttr-dashboard/
+bun install
 CI=1 bunx expo start &
 
 # open web page
